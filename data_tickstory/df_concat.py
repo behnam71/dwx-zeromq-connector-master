@@ -28,7 +28,7 @@ for i in range(0, len(_HIST_DATA_DF)):
 
 #_HIST_DATA_DF = _HIST_DATA_DF.sort_values(by=['date','tic']).reset_index(drop=True)
 
-_HIST_DATA_DF.to_csv("file.csv", float_format='%6.5f')
+_HIST_DATA_DF.to_csv("mt4_dataset_o.csv", float_format='%6.5f')
 print(_HIST_DATA_DF)
 
 
