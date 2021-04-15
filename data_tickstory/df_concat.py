@@ -6,7 +6,6 @@ import glob
 Dir_Path = 'C:\\Users\\Administrator\\Documents\\M1\\forex_data'
 
 
-
 def FileName(path):
     os.chdir(path)
     result = glob.glob('*.csv')
