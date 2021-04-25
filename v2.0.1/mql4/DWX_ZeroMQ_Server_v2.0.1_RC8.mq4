@@ -227,7 +227,6 @@ void OnTick() {
             if(count > 0 && curr_rate[0].time > Publish_Instruments[s].getLastPublishTimestamp()) {
                 Print("+==================================================+");
                 double _Balance = AccountBalance();
-                string _Balance_2D = DoubleToStr(_Balance, 2);
 
                 double _close_30_sma = iMA(Publish_Instruments[s].symbol(), 60, 30, 0, MODE_EMA, PRICE_CLOSE, 0);  
                 double _close_60_sma = iMA(Publish_Instruments[s].symbol(), 60, 60, 0, MODE_EMA, PRICE_CLOSE, 0);
@@ -239,16 +238,16 @@ void OnTick() {
                 double _macd = iMACD(Publish_Instruments[s].symbol(), 60, 12, 26, 9, PRICE_CLOSE, MODE_MAIN, 0);
   
                 // then send a new pub message with this new rate
-                string _rates = StringFormat("%s;%f;%f;%f;%f;%s;%s;%s",
+                string _rates = StringFormat("%s,%f,%f,%f,%f,%s,%s,%s",
                                     StringFormat("%s",TimeToStr(curr_rate[0].time)),
                                     curr_rate[0].open, 
                                     curr_rate[0].high, 
                                     curr_rate[0].low,
-                                    curr_rate[0].close, 
+                                    double(curr_rate[0].close), 
                                     string(curr_rate[0].tick_volume), 
                                     string(curr_rate[0].spread), 
                                     string(curr_rate[0].real_volume));
-                ZmqMsg reply(StringFormat("%s--%s--%s;%s;%s;%s;%s;%s;%s;%s;%s", Publish_Instruments[s].name(), _Balance_2D, _rates,
+                ZmqMsg reply(StringFormat("%s&%s&%s|%s;%s;%s;%s;%s;%s;%s;%s", Publish_Instruments[s].name(), string(_Balance), _rates,
                              string(_macd), string(_boll_ub), string(_boll_lb), string(_rsi_30), string(_cci_30), string(_adx_30),
                              string(_close_30_sma), string(_close_60_sma)));
                 Print("Sending Rates @"+TimeToStr(curr_rate[0].time) + " [" + reply.getData() + "] to PUB Socket");
@@ -260,13 +259,13 @@ void OnTick() {
                 int handle=FileOpen("OrdersReport.csv",FILE_READ|FILE_WRITE|FILE_CSV);
                 if(handle != INVALID_HANDLE) {
                     // write header
-                    FileWrite(handle, "Ticket", "symbol", "lots", "swap");
+                    FileWrite(handle, "Ticket", "symbol", "lots", "swap", "commission");
                     int total = OrdersTotal();
                     // write open orders
                     for(int pos=0; pos<total; pos++) {
                         Print(OrderSwap());
                         if(OrderSelect(pos,SELECT_BY_POS) == false) continue;
-                        FileWrite(handle, OrderTicket(), OrderSymbol(), OrderLots(), OrderSwap());
+                        FileWrite(handle, OrderTicket(), OrderSymbol(), OrderLots(), OrderSwap(), OrderCommission());
                     }
                     FileClose(handle);
                 }
