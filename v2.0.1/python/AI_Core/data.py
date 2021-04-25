@@ -14,7 +14,7 @@ from time import sleep
     ----------------------------------------------------------------------------------------------
     ----------------------------------------------------------------------------------------------
 """
-_symbols = [('EURUSD_H1', 'EURUSD', 60), ('USDCAD_H1', 'USDCAD', 60)]
+_symbols = [('AAPL_H1', 'AAPL', 60), ('INTC_H1', 'INTC', 60)]
 
 
 # creates object with a predefined configuration
