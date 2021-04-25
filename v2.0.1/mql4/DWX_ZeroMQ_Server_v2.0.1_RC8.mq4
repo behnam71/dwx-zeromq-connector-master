@@ -237,7 +237,7 @@ void OnTick() {
                 double _boll_lb = iBands(Publish_Instruments[s].symbol(), 60, 20, 2, 0, PRICE_LOW, MODE_LOWER, 0);    
                 double _boll_ub = iBands(Publish_Instruments[s].symbol(), 60, 20, 2, 0, PRICE_HIGH, MODE_UPPER, 0);
                 double _macd = iMACD(Publish_Instruments[s].symbol(), 60, 12, 26, 9, PRICE_CLOSE, MODE_MAIN, 0);
-
+  
                 // then send a new pub message with this new rate
                 string _rates = StringFormat("%s;%f;%f;%f;%f;%s;%s;%s",
                                     StringFormat("%s",TimeToStr(curr_rate[0].time)),
@@ -255,6 +255,22 @@ void OnTick() {
                 if(!pubSocket.send(reply, true)) {
                     Print("###ERROR### Sending rate");            
                 }
+                
+                ResetLastError();
+                int handle=FileOpen("OrdersReport.csv",FILE_READ|FILE_WRITE|FILE_CSV);
+                if(handle != INVALID_HANDLE) {
+                    // write header
+                    FileWrite(handle, "Ticket", "symbol", "lots", "swap");
+                    int total = OrdersTotal();
+                    // write open orders
+                    for(int pos=0; pos<total; pos++) {
+                        Print(OrderSwap());
+                        if(OrderSelect(pos,SELECT_BY_POS) == false) continue;
+                        FileWrite(handle, OrderTicket(), OrderSymbol(), OrderLots(), OrderSwap());
+                    }
+                    FileClose(handle);
+                }
+                
                 // updates the timestamp
                 Publish_Instruments[s].setLastPublishTimestamp(curr_rate[0].time);
                 
