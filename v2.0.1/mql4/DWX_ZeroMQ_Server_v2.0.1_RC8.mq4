@@ -259,13 +259,12 @@ void OnTick() {
                 int handle=FileOpen("OrdersReport.csv",FILE_READ|FILE_WRITE|FILE_CSV);
                 if(handle != INVALID_HANDLE) {
                     // write header
-                    FileWrite(handle, "Ticket", "symbol", "lots", "swap", "commission");
+                    FileWrite(handle, "Ticket", "symbol", "lots", "swap", "commission", "FreeMargin", "Leverage");
                     int total = OrdersTotal();
                     // write open orders
                     for(int pos=0; pos<total; pos++) {
-                        Print(OrderSwap());
                         if(OrderSelect(pos,SELECT_BY_POS) == false) continue;
-                        FileWrite(handle, OrderTicket(), OrderSymbol(), OrderLots(), OrderSwap(), OrderCommission());
+                        FileWrite(handle, OrderTicket(), OrderSymbol(), OrderLots(), OrderSwap(), OrderCommission(), AccountFreeMargin(), AccountLeverage());
                     }
                     FileClose(handle);
                 }
