@@ -219,15 +219,18 @@ void OnTick() {
       }
       
       // Python clients can also subscribe to a rates feed for each tracked instrument
-      if(Publish_MarketRates == true) {
-        for(int s = 0; s < ArraySize(Publish_Instruments); s++) {
+      if (Publish_MarketRates == true) {
+        int handle1 = FileOpen("Leverage.txt",FILE_READ|FILE_WRITE|FILE_TXT);
+        FileWrite(handle1, AccountLeverage());
+        FileClose(handle1);
+        for (int s = 0; s < ArraySize(Publish_Instruments); s++) {
             MqlRates curr_rate[];
             int count = Publish_Instruments[s].GetRates(curr_rate, 2);
             // if last rate is returned and its timestamp is greater than the last published...
             if(count > 0 && curr_rate[0].time > Publish_Instruments[s].getLastPublishTimestamp()) {
                 Print("+==================================================+");
                 double _Balance = AccountBalance();
-
+                
                 double _close_30_sma = iMA(Publish_Instruments[s].symbol(), 60, 30, 0, MODE_EMA, PRICE_CLOSE, 0);  
                 double _close_60_sma = iMA(Publish_Instruments[s].symbol(), 60, 60, 0, MODE_EMA, PRICE_CLOSE, 0);
                 double _cci_30 = iCCI(Publish_Instruments[s].symbol(), 60, 30, PRICE_CLOSE, 0);       
@@ -256,18 +259,18 @@ void OnTick() {
                 }
                 
                 ResetLastError();
-                int handle=FileOpen("OrdersReport.csv",FILE_READ|FILE_WRITE|FILE_CSV);
-                if(handle != INVALID_HANDLE) {
+                int handle2 = FileOpen("OrdersReport.csv",FILE_READ|FILE_WRITE|FILE_CSV);
+                if (handle2 != INVALID_HANDLE) {
                     // write header
-                    FileWrite(handle, "Ticket", "symbol", "lots", "swap", "commission", "FreeMargin", "Leverage", "Spread");
+                    FileWrite(handle2, "Ticket", "symbol", "lots", "swap", "commission", "FreeMargin", "Leverage", "Spread");
                     int total = OrdersTotal();
                     // write open orders
-                    for(int pos=0; pos<total; pos++) {
-                        if(OrderSelect(pos,SELECT_BY_POS) == false) continue;
+                    for (int pos=0; pos<total; pos++) {
+                        if (OrderSelect(pos,SELECT_BY_POS) == false) continue;
                         double spread_value = MarketInfo(OrderSymbol(), MODE_SPREAD);
-                        FileWrite(handle, OrderTicket(), OrderSymbol(), OrderLots(), OrderSwap(), OrderCommission(), AccountFreeMargin(), AccountLeverage(), spread_value);
+                        FileWrite(handle2, OrderTicket(), OrderSymbol(), OrderLots(), OrderSwap(), OrderCommission(), AccountFreeMargin(), AccountLeverage(), spread_value);
                     }
-                    FileClose(handle);
+                    FileClose(handle2);
                 }
                 
                 // updates the timestamp
