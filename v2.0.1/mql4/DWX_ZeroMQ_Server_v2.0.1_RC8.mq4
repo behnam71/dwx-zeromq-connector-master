@@ -29,8 +29,8 @@ extern int MILLISECOND_TIMER = 1;
 extern int MILLISECOND_TIMER_PRICES = 500;
 
 extern string t0 = "--- Trading Parameters ---";
-extern int MaximumOrders = 1;
-extern double MaximumLotSize = 0.01;
+extern int MaximumOrders = 1000;
+extern double MaximumLotSize = 1.0;
 extern int MaximumSlippage = 3;
 extern bool DMA_MODE = true;
 
