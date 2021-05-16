@@ -107,18 +107,17 @@ class rates_historic(DWX_ZMQ_Strategy):
 
         # request rates
         for i in range(0, len(self._symbols)):
-          print('Requesting Daily Rates from {}'.format(self._symbols[i]))
-          self._zmq._DWX_MTX_SEND_HIST_REQUEST_(_symbol=self._symbols[i],
+            print('Requesting Daily Rates from {}'.format(self._symbols[i]))
+            self._zmq._DWX_MTX_SEND_HIST_REQUEST_(_symbol=self._symbols[i],
                                                   _timeframe=60)
-          sleep(7)
-        sleep(1)
-
+            sleep(2)
+            
         print('\nCreating a History Data Dataframe:')
         _HIST_DATA_DF = pd.DataFrame()
         for symbol in self._symbols:
-          symbol_H1 = "{}_H1".format(symbol)
-          for i in range(0, len(self._zmq._History_DB[symbol_H1])):
-            _HIST_DATA_DF=_HIST_DATA_DF.append([self._zmq._History_DB[symbol_H1][i].values()])
+            symbol_H1 = "{}_H1".format(symbol)
+            for i in range(0, len(self._zmq._History_DB[symbol_H1])):
+                _HIST_DATA_DF=_HIST_DATA_DF.append([self._zmq._History_DB[symbol_H1][i].values()])
         _HIST_DATA_DF.columns = ["date",
                                  "open",
                                  "high",
@@ -127,7 +126,7 @@ class rates_historic(DWX_ZMQ_Strategy):
                                  "volume",
                                  "spread",
                                  "real_vol",
-                                 ]
+                                ]
         print("Dataframe:")
         print(_HIST_DATA_DF)
 
@@ -138,19 +137,18 @@ class rates_historic(DWX_ZMQ_Strategy):
     def stop(self):
       """
       unsubscribe from all market symbols and exits
-      """
-        
+      """   
       # remove subscriptions and stop symbols price feeding
       try:
-        # Acquire lock
-        self._lock.acquire()
-        self._zmq._DWX_MTX_UNSUBSCRIBE_ALL_MARKETDATA_REQUESTS_()
-        print('Unsubscribing from all topics')
+          # Acquire lock
+          self._lock.acquire()
+          self._zmq._DWX_MTX_UNSUBSCRIBE_ALL_MARKETDATA_REQUESTS_()
+          print('Unsubscribing from all topics')
           
       finally:
-        # Release lock
-        self._lock.release()
-        sleep(self._delay)
+          # Release lock
+          self._lock.release()
+          sleep(self._delay)
       
       self._finished = True
 
@@ -174,5 +172,5 @@ if __name__ == "__main__":
   # Waits example termination
   print('Waiting example termination...')
   while not example.isFinished():
-    sleep(1)
+      sleep(1)
   print('Bye!!!')
