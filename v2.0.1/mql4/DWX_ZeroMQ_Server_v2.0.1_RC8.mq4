@@ -218,9 +218,14 @@ void OnTick() {
       
       // Python clients can also subscribe to a rates feed for each tracked instrument
       if (Publish_MarketRates == true) {
-         int handle1 = FileOpen("Leverage.txt",FILE_READ|FILE_WRITE|FILE_TXT);
-         FileWrite(handle1, AccountLeverage());
-         FileClose(handle1);
+         int handle1 = FileOpen("L_FM.csv",FILE_READ|FILE_WRITE|FILE_CSV);
+         if (handle1 != INVALID_HANDLE) {
+            // write header
+            FileWrite(handle1, "Leverage", "FreeMargin");
+            FileWrite(handle1, AccountLeverage(), AccountFreeMargin());
+            }
+            FileClose(handle1);
+
          for (int s = 0; s < ArraySize(Publish_Instruments); s++) {
             MqlRates curr_rate[];
             int count = Publish_Instruments[s].GetRates(curr_rate, 2);
@@ -260,13 +265,13 @@ void OnTick() {
                 int handle2 = FileOpen("OrdersReport.csv",FILE_READ|FILE_WRITE|FILE_CSV);
                 if (handle2 != INVALID_HANDLE) {
                    // write header
-                   FileWrite(handle2, "Ticket", "symbol", "lots", "swap", "commission", "FreeMargin", "Leverage", "Spread");
+                   FileWrite(handle2, "Ticket", "symbol", "lots", "swap", "commission", "FreeMargin", "Spread");
                    int total = OrdersTotal();
                    // write open orders
                    for (int pos=0; pos<total; pos++) {
                       if (OrderSelect(pos,SELECT_BY_POS) == false) continue;
                       double spread_value = MarketInfo(OrderSymbol(), MODE_SPREAD);
-                      FileWrite(handle2, OrderTicket(), OrderSymbol(), OrderLots(), OrderSwap(), OrderCommission(), AccountFreeMargin(), AccountLeverage(), spread_value);
+                      FileWrite(handle2, OrderTicket(), OrderSymbol(), OrderLots(), OrderSwap(), OrderCommission(), AccountFreeMargin(), spread_value);
                    }
                    FileClose(handle2);
                 }
