@@ -260,22 +260,7 @@ void OnTick() {
                 if (!pubSocket.send(reply, true)) {
                    Print("###ERROR### Sending rate");            
                 }
-                
-                ResetLastError();
-                int handle2 = FileOpen("OrdersReport.csv",FILE_READ|FILE_WRITE|FILE_CSV);
-                if (handle2 != INVALID_HANDLE) {
-                   // write header
-                   FileWrite(handle2, "Ticket", "symbol", "lots", "swap", "commission", "FreeMargin", "Spread");
-                   int total = OrdersTotal();
-                   // write open orders
-                   for (int pos=0; pos<total; pos++) {
-                      if (OrderSelect(pos,SELECT_BY_POS) == false) continue;
-                      double spread_value = MarketInfo(OrderSymbol(), MODE_SPREAD);
-                      FileWrite(handle2, OrderTicket(), OrderSymbol(), OrderLots(), OrderSwap(), OrderCommission(), AccountFreeMargin(), spread_value);
-                   }
-                   FileClose(handle2);
-                }
-                
+           
                 // updates the timestamp
                 Publish_Instruments[s].setLastPublishTimestamp(curr_rate[0].time);         
             }
@@ -1113,6 +1098,21 @@ void DWX_CloseAllOrders(string &zmq_ret) {
 //+------------------------------------------------------------------+
 // GET OPEN ORDERS
 void DWX_GetOpenOrders(string &zmq_ret) {
+   ResetLastError();
+   int handle2 = FileOpen("OrdersReport.csv",FILE_READ|FILE_WRITE|FILE_CSV);
+   if (handle2 != INVALID_HANDLE) {
+   // write header
+   FileWrite(handle2, "Ticket", "symbol", "lots", "swap", "commission", "FreeMargin", "Spread");
+   int total = OrdersTotal();
+   // write open orders
+   for (int pos=0; pos<total; pos++) {
+      if (OrderSelect(pos,SELECT_BY_POS) == false) continue;
+      double spread_value = MarketInfo(OrderSymbol(), MODE_SPREAD);
+      FileWrite(handle2, OrderTicket(), OrderSymbol(), OrderLots(), OrderSwap(), OrderCommission(), AccountFreeMargin(), spread_value);
+      }
+      FileClose(handle2);
+   }
+                
    bool found = false;
 
    zmq_ret = zmq_ret + "'_action': 'OPEN_TRADES'";
