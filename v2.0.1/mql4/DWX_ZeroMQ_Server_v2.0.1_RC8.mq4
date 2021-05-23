@@ -234,16 +234,16 @@ void OnTick() {
                Print("+==================================================+");
                double _Balance = AccountBalance();
                 
-               double _macd_MAIN = iMACD(Publish_Instruments[s].symbol(), 0, 12, 26, 9, PRICE_CLOSE, MODE_MAIN, 0);
-               double _macd_SIGNAL = iMACD(Publish_Instruments[s].symbol(), 0, 12, 26, 9, PRICE_CLOSE, MODE_SIGNAL, 0);
-               double _ema_14 = iMA(Publish_Instruments[s].symbol(), 0, 14, 0, MODE_EMA, PRICE_CLOSE, 0);  
-               double _cci_14 = iCCI(Publish_Instruments[s].symbol(), 0, 14, PRICE_TYPICAL, 0);
-               double _boll_lb = iBands(Publish_Instruments[s].symbol(), 0, 20, 2, 0, PRICE_LOW, MODE_LOWER, 0);    
-               double _boll_ub = iBands(Publish_Instruments[s].symbol(), 0, 20, 2, 0, PRICE_HIGH, MODE_UPPER, 0);     
-               double _rsi_14 = iRSI(Publish_Instruments[s].symbol(), 0, 14, PRICE_CLOSE, 0);                         
-               double _adx_14 = iADX(Publish_Instruments[s].symbol(), 0, 14, PRICE_CLOSE, MODE_MAIN, 0);
-               double _atr_12 = iATR(Publish_Instruments[s].symbol(), 0, 12, 0);
-
+               double upper_band = iBands(Publish_Instruments[s].symbol(), 0, 20, 2, 0, PRICE_HIGH, MODE_UPPER, 0);
+               double lower_band = iBands(Publish_Instruments[s].symbol(), 0, 20, 2, 0, PRICE_LOW, MODE_LOWER, 0);
+               double ema = iMA(Publish_Instruments[s].symbol(), 0, 14, 0, MODE_EMA, PRICE_CLOSE, 0);
+               double macd_signal = iMACD(Publish_Instruments[s].symbol(), 0, 12, 26, 9, PRICE_CLOSE, MODE_SIGNAL, 0);
+               double macd_hist = iMACD(Publish_Instruments[s].symbol(), 0, 12, 26, 9, PRICE_CLOSE, MODE_MAIN, 0);
+               double cci = iCCI(Publish_Instruments[s].symbol(), 0, 14, PRICE_TYPICAL, 0);
+               double atr = iATR(Publish_Instruments[s].symbol(), 0, 12, 0);
+               double rsi = iRSI(Publish_Instruments[s].symbol(), 0, 14, PRICE_CLOSE, 0);                         
+               double adx = iADX(Publish_Instruments[s].symbol(), 0, 14, PRICE_CLOSE, MODE_MAIN, 0);
+               
                // then send a new pub message with this new rate
                string _rates = StringFormat("%s,%f,%f,%f,%f,%s,%s,%s",
                                             StringFormat("%s",TimeToStr(curr_rate[0].time)),
@@ -255,15 +255,15 @@ void OnTick() {
                                             string(curr_rate[0].spread), 
                                             string(curr_rate[0].real_volume));
                 ZmqMsg reply(StringFormat("%s&%s&%s|%s;%s;%s;%s;%s;%s;%s;%s;%s", Publish_Instruments[s].name(), string(_Balance), _rates, 
-                                          string(_macd_MAIN), string(_macd_SIGNAL), string(_ema_14), string(_cci_14), string(_boll_lb), 
-                                          string(_boll_ub), string(_rsi_14), string(_adx_14), string(_atr_12)));
+                                          string(upper_band), string(lower_band), string(ema), string(macd_signal), string(macd_hist), 
+                                          string(cci), string(atr), string(rsi), string(adx)));
                 Print("Sending Rates @"+TimeToStr(curr_rate[0].time) + " [" + reply.getData() + "] to PUB Socket");
                 if (!pubSocket.send(reply, true)) {
                    Print("###ERROR### Sending rate");            
                 }
            
                 // updates the timestamp
-                Publish_Instruments[s].setLastPublishTimestamp(curr_rate[0].time);       
+                Publish_Instruments[s].setLastPublishTimestamp(curr_rate[0].time);         
             }
          }
       }
