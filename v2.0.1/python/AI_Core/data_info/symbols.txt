@@ -1,1 +1,0 @@
-[('V_M30', 'V', 30), ('PG_M30', 'PG', 30), ('BA_M30', 'BA', 30), ('VZ_M30', 'VZ', 30), ('WMT_M30', 'WMT', 30), ('IBM_M30', 'IBM', 30), ('JPM_M30', 'JPM', 30), ('JNJ_M30', 'JNJ', 30), ('CAT_M30', 'CAT', 30), ('MCD_M30', 'MCD', 30), ('MMM_M30', 'MMM', 30), ('PFE_M30', 'PFE', 30), ('XOM_M30', 'XOM', 30), ('CSCO_M30', 'CSCO', 30), ('INTC_M30', 'INTC', 30), ('AAPL_M30', 'AAPL', 30)]
