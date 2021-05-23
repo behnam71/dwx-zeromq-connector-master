@@ -225,7 +225,7 @@ void OnTick() {
             FileWrite(handle1, AccountLeverage(), AccountFreeMargin());
             }
             FileClose(handle1);
-
+            
          for (int s = 0; s < ArraySize(Publish_Instruments); s++) {
             MqlRates curr_rate[];
             int count = Publish_Instruments[s].GetRates(curr_rate, 2);
@@ -234,15 +234,16 @@ void OnTick() {
                Print("+==================================================+");
                double _Balance = AccountBalance();
                 
-               double _close_30_sma = iMA(Publish_Instruments[s].symbol(), 60, 30, 0, MODE_EMA, PRICE_CLOSE, 0);  
-               double _close_60_sma = iMA(Publish_Instruments[s].symbol(), 60, 60, 0, MODE_EMA, PRICE_CLOSE, 0);
-               double _cci_30 = iCCI(Publish_Instruments[s].symbol(), 60, 30, PRICE_CLOSE, 0);       
-               double _rsi_30 = iRSI(Publish_Instruments[s].symbol(), 60, 30, PRICE_CLOSE, 0);                         
-               double _adx_30 = iADX(Publish_Instruments[s].symbol(), 60, 30, PRICE_HIGH, MODE_MAIN, 0);
-               double _boll_lb = iBands(Publish_Instruments[s].symbol(), 60, 20, 2, 0, PRICE_LOW, MODE_LOWER, 0);    
-               double _boll_ub = iBands(Publish_Instruments[s].symbol(), 60, 20, 2, 0, PRICE_HIGH, MODE_UPPER, 0);
-               double _macd = iMACD(Publish_Instruments[s].symbol(), 60, 12, 26, 9, PRICE_CLOSE, MODE_MAIN, 0);
-  
+               double _macd_MAIN = iMACD(Publish_Instruments[s].symbol(), 0, 12, 26, 9, PRICE_CLOSE, MODE_MAIN, 0);
+               double _macd_SIGNAL = iMACD(Publish_Instruments[s].symbol(), 0, 12, 26, 9, PRICE_CLOSE, MODE_SIGNAL, 0);
+               double _ema_14 = iMA(Publish_Instruments[s].symbol(), 0, 14, 0, MODE_EMA, PRICE_CLOSE, 0);  
+               double _cci_14 = iCCI(Publish_Instruments[s].symbol(), 0, 14, PRICE_TYPICAL, 0);
+               double _boll_lb = iBands(Publish_Instruments[s].symbol(), 0, 20, 2, 0, PRICE_LOW, MODE_LOWER, 0);    
+               double _boll_ub = iBands(Publish_Instruments[s].symbol(), 0, 20, 2, 0, PRICE_HIGH, MODE_UPPER, 0);     
+               double _rsi_14 = iRSI(Publish_Instruments[s].symbol(), 0, 14, PRICE_CLOSE, 0);                         
+               double _adx_14 = iADX(Publish_Instruments[s].symbol(), 0, 14, PRICE_CLOSE, MODE_MAIN, 0);
+               double _atr_12 = iATR(Publish_Instruments[s].symbol(), 0, 12, 0);
+
                // then send a new pub message with this new rate
                string _rates = StringFormat("%s,%f,%f,%f,%f,%s,%s,%s",
                                             StringFormat("%s",TimeToStr(curr_rate[0].time)),
@@ -253,16 +254,16 @@ void OnTick() {
                                             string(curr_rate[0].tick_volume), 
                                             string(curr_rate[0].spread), 
                                             string(curr_rate[0].real_volume));
-                ZmqMsg reply(StringFormat("%s&%s&%s|%s;%s;%s;%s;%s;%s;%s;%s", Publish_Instruments[s].name(), string(_Balance), _rates,
-                             string(_macd), string(_boll_ub), string(_boll_lb), string(_rsi_30), string(_cci_30), string(_adx_30),
-                             string(_close_30_sma), string(_close_60_sma)));
+                ZmqMsg reply(StringFormat("%s&%s&%s|%s;%s;%s;%s;%s;%s;%s;%s;%s", Publish_Instruments[s].name(), string(_Balance), _rates, 
+                                          string(_macd_MAIN), string(_macd_SIGNAL), string(_ema_14), string(_cci_14), string(_boll_lb), 
+                                          string(_boll_ub), string(_rsi_14), string(_adx_14), string(_atr_12)));
                 Print("Sending Rates @"+TimeToStr(curr_rate[0].time) + " [" + reply.getData() + "] to PUB Socket");
                 if (!pubSocket.send(reply, true)) {
                    Print("###ERROR### Sending rate");            
                 }
            
                 // updates the timestamp
-                Publish_Instruments[s].setLastPublishTimestamp(curr_rate[0].time);         
+                Publish_Instruments[s].setLastPublishTimestamp(curr_rate[0].time);       
             }
          }
       }
