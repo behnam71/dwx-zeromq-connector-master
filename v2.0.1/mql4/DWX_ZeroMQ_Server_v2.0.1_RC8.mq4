@@ -240,9 +240,10 @@ void OnTick() {
                double macd_signal = iMACD(Publish_Instruments[s].symbol(), 0, 12, 26, 9, PRICE_CLOSE, MODE_SIGNAL, 0);
                double macd_hist = iMACD(Publish_Instruments[s].symbol(), 0, 12, 26, 9, PRICE_CLOSE, MODE_MAIN, 0);
                double cci = iCCI(Publish_Instruments[s].symbol(), 0, 14, PRICE_TYPICAL, 0);
-               double atr = iATR(Publish_Instruments[s].symbol(), 0, 12, 0);
                double rsi = iRSI(Publish_Instruments[s].symbol(), 0, 14, PRICE_CLOSE, 0);                         
                double adx = iADX(Publish_Instruments[s].symbol(), 0, 14, PRICE_CLOSE, MODE_MAIN, 0);
+               double stochastic_k = iStochastic(NULL, 0, 5, 3, 3, MODE_SMA, 0, MODE_MAIN, 0);
+               double stochastic_d = iStochastic(NULL, 0, 5, 3, 3, MODE_SMA, 0, MODE_SIGNAL, 0);
                
                // then send a new pub message with this new rate
                string _rates = StringFormat("%s,%f,%f,%f,%f,%s,%s,%s",
@@ -254,9 +255,9 @@ void OnTick() {
                                             string(curr_rate[0].tick_volume), 
                                             string(curr_rate[0].spread), 
                                             string(curr_rate[0].real_volume));
-                ZmqMsg reply(StringFormat("%s&%s&%s|%s;%s;%s;%s;%s;%s;%s;%s;%s", Publish_Instruments[s].name(), string(_Balance), _rates, 
+                ZmqMsg reply(StringFormat("%s&%s&%s|%s;%s;%s;%s;%s;%s;%s;%s;%s;%s", Publish_Instruments[s].name(), string(_Balance), _rates, 
                                           string(upper_band), string(lower_band), string(ema), string(macd_signal), string(macd_hist), 
-                                          string(cci), string(atr), string(rsi), string(adx)));
+                                          string(cci), string(rsi), string(adx), string(stochastic_k), string(stochastic_d)));
                 Print("Sending Rates @"+TimeToStr(curr_rate[0].time) + " [" + reply.getData() + "] to PUB Socket");
                 if (!pubSocket.send(reply, true)) {
                    Print("###ERROR### Sending rate");            
