@@ -242,8 +242,8 @@ void OnTick() {
                double cci = iCCI(Publish_Instruments[s].symbol(), 0, 14, PRICE_TYPICAL, 0);
                double rsi = iRSI(Publish_Instruments[s].symbol(), 0, 14, PRICE_CLOSE, 0);                         
                double adx = iADX(Publish_Instruments[s].symbol(), 0, 14, PRICE_CLOSE, MODE_MAIN, 0);
-               double stochastic_k = iStochastic(NULL, 0, 5, 3, 3, MODE_SMA, 0, MODE_MAIN, 0);
-               double stochastic_d = iStochastic(NULL, 0, 5, 3, 3, MODE_SMA, 0, MODE_SIGNAL, 0);
+               double stochastic_k = iStochastic(Publish_Instruments[s].symbol(), 0, 5, 3, 3, MODE_SMA, 0, MODE_MAIN, 0);
+               double stochastic_d = iStochastic(Publish_Instruments[s].symbol(), 0, 5, 3, 3, MODE_SMA, 0, MODE_SIGNAL, 0);
                
                // then send a new pub message with this new rate
                string _rates = StringFormat("%s,%f,%f,%f,%f,%s,%s,%s",
