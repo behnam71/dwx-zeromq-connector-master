@@ -255,9 +255,11 @@ void OnTick() {
                                             string(curr_rate[0].tick_volume), 
                                             string(curr_rate[0].spread), 
                                             string(curr_rate[0].real_volume));
-                ZmqMsg reply(StringFormat("%s&%s&%s|%s;%s;%s;%s;%s;%s;%s;%s;%s;%s", Publish_Instruments[s].name(), string(_Balance), _rates, 
-                                          string(upper_band), string(lower_band), string(ema), string(macd_signal), string(macd_hist), 
-                                          string(cci), string(rsi), string(adx), string(stochastic_k), string(stochastic_d)));
+                ZmqMsg reply(StringFormat("%s&%s&%s|%s;%s;%s;%s;%s;%s;%s;%s;%s;%s", Publish_Instruments[s].name(), DoubleToString(_Balance, 2), _rates, 
+                                          DoubleToString(upper_band, 5), DoubleToString(lower_band, 5), DoubleToString(ema, 5), 
+                                          DoubleToString(macd_signal, 5), DoubleToString(macd_hist, 5), DoubleToString(cci, 5), 
+                                          DoubleToString(rsi, 5), DoubleToString(adx, 5), DoubleToString(stochastic_k, 5), 
+                                          DoubleToString(stochastic_d, 5)));
                 Print("Sending Rates @"+TimeToStr(curr_rate[0].time) + " [" + reply.getData() + "] to PUB Socket");
                 if (!pubSocket.send(reply, true)) {
                    Print("###ERROR### Sending rate");            
